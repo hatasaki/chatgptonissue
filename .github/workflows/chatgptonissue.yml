@@ -26,6 +26,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
+          python << EOF
           import os
           import json
           import openai
@@ -58,3 +59,4 @@ jobs:
 
           # Add the response as a comment
           issue.create_comment(chat_gpt_response)
+          EOF
