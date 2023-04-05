@@ -2,7 +2,7 @@ name: ChatGPT on issue
 
 on:
   issues:
-    types: [opened]
+    types: [opened, edited]
 
 jobs:
   chat_gpt_comment:
