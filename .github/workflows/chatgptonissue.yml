@@ -3,6 +3,8 @@ name: ChatGPT on issue
 on:
   issues:
     types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
 
 jobs:
   chat_gpt_comment:
