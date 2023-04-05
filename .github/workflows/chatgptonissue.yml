@@ -1,0 +1,60 @@
+name: ChatGPT on issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  chat_gpt_comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install openai
+
+      - name: Get ChatGPT response and add comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          import os
+          import json
+          import openai
+          from github import Github
+
+          # Set up OpenAI API
+          openai.api_key = os.environ["OPENAI_API_KEY"]
+
+          # Set up GitHub API
+          g = Github(os.environ["GITHUB_TOKEN"])
+          repo = g.get_repo(os.getenv("GITHUB_REPOSITORY"))
+          issue_number = os.getenv("ISSUE_NUMBER")
+          issue = repo.get_issue(number=int(issue_number))
+
+          # Get the issue content as a prompt
+          prompt = issue.body
+
+          # Call the ChatGPT API with the prompt
+          response = openai.Completion.create(
+            engine="text-davinci-002",
+            prompt=prompt,
+            max_tokens=150,
+            n=1,
+            stop=None,
+            temperature=0.8,
+          )
+
+          # Get the ChatGPT response
+          chat_gpt_response = response.choices[0].text.strip()
+
+          # Add the response as a comment
+          issue.create_comment(chat_gpt_response)
